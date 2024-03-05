@@ -1,7 +1,15 @@
 package com.conkers.siceapp.Data
 
+import android.util.Log
+import com.conkers.siceapp.model.AccesoAlAlumnoEnvelope
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.simpleframework.xml.core.Persister
+import java.io.IOException
+import java.io.StringReader
+
 class conexionRepositorio(
-    private val accesoAlumnoApi: AccesoAlumnoRetro)
+    private val accesoAlumnoApi: RetrofitContenedor){
 suspend fun getAcceso(matricula: String, contrasenia: String, tipoUsuario: String): String? {
     val xml = """
             <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -17,12 +25,12 @@ suspend fun getAcceso(matricula: String, contrasenia: String, tipoUsuario: Strin
     Log.d("xml: ",xml)
     val requestBody = xml.toRequestBody("application/soap+xml".toMediaType())
     return try {
-        val response = accesoAlumnoApi.getAcceso(requestBody)
+        val response = accesoAlumnoApi.ObtenerAcceso
         val responseBodyString = response.string()
 
         val serializer = Persister()
         val reader = StringReader(responseBodyString)
-        val envelope = serializer.read(AccesoAlumnoEnvelope::class.java, reader)
+        val envelope = serializer.read(AccesoAlAlumnoEnvelope::class.java, reader)
         var respuestaJson = envelope.body?.response?.result.toString()
 
         // Utiliza Gson para convertir el JSON a un objeto Kotlin
@@ -31,4 +39,5 @@ suspend fun getAcceso(matricula: String, contrasenia: String, tipoUsuario: Strin
         Log.e(TAG_ERROR,"${e.message}")
         ""
     }
+}
 }

@@ -1,6 +1,7 @@
 package com.conkers.siceapp.Data
 
 import android.util.Log
+import com.conkers.siceapp.Network.AccesoAlumnoApi
 import com.conkers.siceapp.model.AccesoAlAlumnoEnvelope
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -8,9 +9,12 @@ import org.simpleframework.xml.core.Persister
 import java.io.IOException
 import java.io.StringReader
 
+
+private const val TAG_SUCCESS = "SUCCESS"
+private const val TAG_ERROR = "ERROR"
 class conexionRepositorio(
-    private val accesoAlumnoApi: RetrofitContenedor){
-suspend fun getAcceso(matricula: String, contrasenia: String, tipoUsuario: String): String? {
+    private val accesoAlumnoApi: AccesoAlumnoApi){
+suspend fun ObtenerAcceso(matricula: String, contrasenia: String, tipoUsuario: String): String? {
     val xml = """
             <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
               <soap:Body>
@@ -25,13 +29,13 @@ suspend fun getAcceso(matricula: String, contrasenia: String, tipoUsuario: Strin
     Log.d("xml: ",xml)
     val requestBody = xml.toRequestBody("application/soap+xml".toMediaType())
     return try {
-        val response = accesoAlumnoApi.ObtenerAcceso
+        val response = accesoAlumnoApi.ObtenerAcceso(requestBody)
         val responseBodyString = response.string()
 
         val serializer = Persister()
         val reader = StringReader(responseBodyString)
         val envelope = serializer.read(AccesoAlAlumnoEnvelope::class.java, reader)
-        var respuestaJson = envelope.body?.response?.result.toString()
+        var respuestaJson = envelope.body?.response?.Result.toString()
 
         // Utiliza Gson para convertir el JSON a un objeto Kotlin
         respuestaJson

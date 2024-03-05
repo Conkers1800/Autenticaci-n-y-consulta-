@@ -14,7 +14,7 @@ interface AccesoAlumnoApi {
         "SOAPAction: \"http://tempuri.org/accesoLogin\""
     )
     @POST("/ws/wsalumnos.asmx")
-    suspend fun getAcceso(@Body requestBody: RequestBody) : ResponseBody
+    suspend fun ObtenerAcceso(@Body requestBody: RequestBody) : ResponseBody
 
 }
 

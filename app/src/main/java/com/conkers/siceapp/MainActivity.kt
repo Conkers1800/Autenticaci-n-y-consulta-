@@ -37,6 +37,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
+import com.conkers.siceapp.Data.conexionRepositorio
 import com.conkers.siceapp.ui.theme.LoggedInScreen
 import com.conkers.siceapp.ui.theme.LoginScreen
 import com.conkers.siceapp.ui.theme.SiceAppTheme
@@ -52,7 +53,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Lanzador(){
     val context = LocalContext.current
-    val windowSize = calculateWindowSizeClass(context as Activity)
     val navController = rememberNavController()
     var Entrar by remember { mutableStateOf(false) }
     var successMessage by remember { mutableStateOf("") }
@@ -60,18 +60,19 @@ fun Lanzador(){
     var username by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
     var cookie by remember { mutableStateOf("") }
-
+    val inicioSesion=conexionRepositorio.Ob
     if (Entrar) {
         LoggedInScreen(navController = navController, cookie = cookie)
     } else {
         LoginScreen(
             context = context,
-            username = username,
-            password = password,
+            matricula = username,
+            contrasenia = password,
             onUsernameChange = { username = it },
             onPasswordChange = { password = it },
+
             onLoginClicked = {
-                performLogin(context, username.text, password.text, navController) { success, message, receivedCookie ->
+                (context, username.text, password.text, navController) { success, message, receivedCookie ->
                     if (success) {
                         loggedIn = true
                         successMessage = message ?: "Inicio de sesion exitoso"

@@ -31,7 +31,10 @@ class ContenedorApis(applicationContext: Context
     private val retrofitAccesoDelAlumno: AccesoAlumnoApi by lazy {
         retrofit.create(AccesoAlumnoApi::class.java)
     }
-    private val retrofitDatosDeAlumno: DatosAlumnoApi by lazy {
+    private val retrofitDatosAlumno: DatosAlumnoApi by lazy {
         retrofit.create(DatosAlumnoApi::class.java)
+    }
+    override val ConexionRepositorio: conexionRepositorio by lazy {
+        conexionRepositorio(retrofitAccesoDelAlumno, retrofitDatosAlumno)
     }
 }

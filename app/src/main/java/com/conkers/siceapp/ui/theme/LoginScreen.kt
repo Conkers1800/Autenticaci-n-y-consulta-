@@ -27,8 +27,9 @@ import com.conkers.siceapp.R
 @Composable
 fun LoginScreen(
     context: Context,
-    username: TextFieldValue,
-    password: TextFieldValue,
+    matricula: TextFieldValue,
+    contrasenia: TextFieldValue,
+    tipoUsuario:String,
     onUsernameChange: (TextFieldValue) -> Unit,
     onPasswordChange: (TextFieldValue) -> Unit,
     onLoginClicked: () -> Unit
@@ -49,14 +50,14 @@ fun LoginScreen(
                     .padding(bottom = 16.dp)
             )
             OutlinedTextField(
-                value = username,
+                value = matricula,
                 onValueChange = onUsernameChange,
                 label = { Text("Username") },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
-                value = password,
+                value = contrasenia,
                 onValueChange = onPasswordChange,
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth(),

@@ -57,6 +57,7 @@ class ConexionRepositorio(
         return try {
             val response = datosAlumnoApi.getAlumnoAcademicoWithLineamiento(requestBody)
             val responseBodyString = response.string()
+
             val serializer = Persister()
             val reader = StringReader(responseBodyString)
             val envelope = serializer.read(AccesoAlAlumnoEnvelope::class.java, reader)

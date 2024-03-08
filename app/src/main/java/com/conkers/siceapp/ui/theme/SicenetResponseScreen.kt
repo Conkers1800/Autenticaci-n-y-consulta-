@@ -12,9 +12,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.conkers.siceapp.model.AccesoAlumno
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 @Composable
 fun SicenetResponseScreen(responseViewModel: ResponseViewModel = viewModel()) {
@@ -32,19 +35,29 @@ fun SicenetResponseScreen(responseViewModel: ResponseViewModel = viewModel()) {
             text = "Respuesta de la API:",
             modifier = Modifier.padding(bottom = 16.dp)
         )
-        Text(
-            text = responseState.value ?: "No hay respuesta",
+        responseState.value?.let { json ->
+            val accesoAlumno = Json.decodeFromString<AccesoAlumno>(json)
+            Text(
+                text = buildString {
+                    append("Acceso: ${accesoAlumno.acceso}\n")
+                    append("Matrícula: ${accesoAlumno.matricula}\n")
+                    append("Estatus: ${accesoAlumno.estatus}\n")
+                    append("Tipo de Usuario: ${accesoAlumno.tipoUsuario}\n")
+                    append("Contraseña: ${accesoAlumno.contrasenia}")
+                },
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        } ?: Text(
+            text = "No hay respuesta",
             modifier = Modifier.padding(bottom = 16.dp)
         )
     }
 }
 
-
 class ResponseViewModel : ViewModel() {
     private val _response = MutableStateFlow<String?>(null)
     val response: StateFlow<String?> = _response
 
-    // Función para actualizar la respuesta del ViewModel
     fun updateResponse(newResponse: String?) {
         viewModelScope.launch {
             _response.emit(newResponse)

@@ -2,7 +2,6 @@ package com.conkers.siceapp.ui.theme
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavDirections
 import androidx.navigation.NavController
 import com.conkers.siceapp.Data.RetrofitContenedor
 import kotlinx.coroutines.delay
@@ -31,7 +30,7 @@ class LoginViewModel(private val retrofitContenedor: RetrofitContenedor) : ViewM
                 navController.navigate("SicenetResponseScreen")
             } else {
                 // Si no se obtiene respuesta, mostrar un mensaje de error
-                _errorText.value = "Error al obtener la respuesta de la API"
+                _errorText.value = "Error al obtener la respuesta del servidor"
             }
             _isLoading.value = false
         }

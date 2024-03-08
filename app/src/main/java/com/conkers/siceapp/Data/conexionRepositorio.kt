@@ -10,15 +10,14 @@ import org.simpleframework.xml.core.Persister
 import java.io.IOException
 import java.io.StringReader
 
-
-private const val TAG_SUCCESS = "SUCCESS"
 private const val TAG_ERROR = "ERROR"
-class conexionRepositorio(
+
+class ConexionRepositorio(
     private val accesoAlumnoApi: AccesoAlumnoApi,
     private val datosAlumnoApi: DatosAlumnoApi
-){
-suspend fun ObtenerAcceso(matricula: String, contrasenia: String, tipoUsuario: String): String? {
-    val xml = """
+) {
+    suspend fun ObtenerAcceso(matricula: String, contrasenia: String, tipoUsuario: String): String? {
+        val xml = """
             <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
               <soap:Body>
                 <accesoLogin xmlns="http://tempuri.org/">
@@ -29,24 +28,24 @@ suspend fun ObtenerAcceso(matricula: String, contrasenia: String, tipoUsuario: S
               </soap:Body>
             </soap:Envelope>
             """.trimIndent()
-    Log.d("xml: ",xml)
-    val requestBody = xml.toRequestBody("application/soap+xml".toMediaType())
-    return try {
-        val response = accesoAlumnoApi.ObtenerAcceso(requestBody)
-        val responseBodyString = response.string()
+        Log.d("xml: ", xml)
+        val requestBody = xml.toRequestBody("application/soap+xml".toMediaType())
+        return try {
+            val response = accesoAlumnoApi.ObtenerAcceso(requestBody)
+            val responseBodyString = response.string()
 
-        val serializer = Persister()
-        val reader = StringReader(responseBodyString)
-        val envelope = serializer.read(AccesoAlAlumnoEnvelope::class.java, reader)
-        var respuestaJson = envelope.body?.response?.Result.toString()
+            val serializer = Persister()
+            val reader = StringReader(responseBodyString)
+            val envelope = serializer.read(AccesoAlAlumnoEnvelope::class.java, reader)
+            var respuestaJson = envelope.body?.response?.result.toString()
 
-        // Utiliza Gson para convertir el JSON a un objeto Kotlin
-        respuestaJson
-    } catch (e: IOException){
-        Log.e(TAG_ERROR,"${e.message}")
-        ""
+            respuestaJson
+        } catch (e: IOException) {
+            Log.e(TAG_ERROR, "${e.message}")
+            ""
+        }
     }
-}
+
     suspend fun getAlumnoAcademicoWithLineamiento(): String? {
         val xml =
             "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
@@ -62,12 +61,11 @@ suspend fun ObtenerAcceso(matricula: String, contrasenia: String, tipoUsuario: S
             val reader = StringReader(responseBodyString)
             val envelope = serializer.read(AccesoAlAlumnoEnvelope::class.java, reader)
 
-            val jsonString = envelope.body?.response?.Result.toString()
+            val jsonString = envelope.body?.response?.result.toString()
             jsonString
         } catch (e: IOException) {
             Log.e(TAG_ERROR, "${e.message}")
             ""
         }
     }
-
 }

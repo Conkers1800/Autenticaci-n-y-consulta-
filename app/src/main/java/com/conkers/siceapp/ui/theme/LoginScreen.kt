@@ -1,75 +1,76 @@
 package com.conkers.siceapp.ui.theme
 
-import android.content.Context
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.conkers.siceapp.R
+import androidx.navigation.NavController
+import com.conkers.siceapp.Data.RetrofitContenedor
 
 @Composable
 fun LoginScreen(
-    context: Context,
-    matricula: TextFieldValue,
-    contrasenia: TextFieldValue,
-    tipoUsuario:String,
-    onUsernameChange: (TextFieldValue) -> Unit,
-    onPasswordChange: (TextFieldValue) -> Unit,
-    onLoginClicked: () -> Unit
+    navController: NavController,
+    retrofitContenedor: RetrofitContenedor,
+    viewModel: LoginViewModel = remember { LoginViewModel(retrofitContenedor) }
 ) {
-    Surface(color = MaterialTheme.colorScheme.background) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+    var usernameState by remember { mutableStateOf("") }
+    var passwordState by remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Campo de texto para el nombre de usuario
+        TextField(
+            value = usernameState,
+            onValueChange = { usernameState = it },
+            label = { Text("Username") },
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Campo de texto para la contraseña
+        TextField(
+            value = passwordState,
+            onValueChange = { passwordState = it },
+            label = { Text("Password") },
+            visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Botón de inicio de sesión
+        Button(
+            onClick = {
+                viewModel.loginUser(navController, usernameState, passwordState)
+            },
+            enabled = !viewModel.isLoading.collectAsState().value,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.descarga),
-                contentDescription = "Logo",
-                modifier = Modifier
-                    .size(200.dp)
-                    .padding(bottom = 16.dp)
-            )
-            OutlinedTextField(
-                value = matricula,
-                onValueChange = onUsernameChange,
-                label = { Text("Username") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(
-                value = contrasenia,
-                onValueChange = onPasswordChange,
-                label = { Text("Password") },
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation()
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = onLoginClicked,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
+            if (viewModel.isLoading.collectAsState().value) {
+                CircularProgressIndicator()
+            } else {
                 Text("Login")
             }
+        }
+
+        // Mostrar mensaje de error si existe
+        if (viewModel.errorText.collectAsState().value != null) {
+            Text(
+                text = viewModel.errorText.collectAsState().value!!,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(top = 8.dp)
+            )
         }
     }
 }

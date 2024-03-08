@@ -2,27 +2,26 @@ package com.conkers.siceapp.Data
 
 import android.content.Context
 import com.conkers.siceapp.Network.AccesoAlumnoApi
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import com.conkers.siceapp.Network.ReceivedCookiesInterceptor
 import com.conkers.siceapp.Network.AddCookiesInterceptor
 import com.conkers.siceapp.Network.DatosAlumnoApi
+import com.conkers.siceapp.Network.ReceivedCookiesInterceptor
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
 
 interface RetrofitContenedor {
-    val ConexionRepositorio: conexionRepositorio
+    val conexionRepositorio: ConexionRepositorio
 }
-class ContenedorApis(applicationContext: Context
 
-){
-    val client = OkHttpClient.Builder()
+class RetrofitContenedorImpl(applicationContext: Context) : RetrofitContenedor {
+    private val client = OkHttpClient.Builder()
         .addInterceptor(AddCookiesInterceptor(applicationContext))
         .addInterceptor(ReceivedCookiesInterceptor(applicationContext))
         .build()
 
-    val retrofit = Retrofit.Builder()
+    private val retrofit = Retrofit.Builder()
         .baseUrl("https://sicenet.surguanajuato.tecnm.mx")
         .client(client)
         .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
@@ -31,10 +30,12 @@ class ContenedorApis(applicationContext: Context
     private val retrofitAccesoDelAlumno: AccesoAlumnoApi by lazy {
         retrofit.create(AccesoAlumnoApi::class.java)
     }
+
     private val retrofitDatosAlumno: DatosAlumnoApi by lazy {
         retrofit.create(DatosAlumnoApi::class.java)
     }
-    override val ConexionRepositorio: conexionRepositorio by lazy {
-        conexionRepositorio(retrofitAccesoDelAlumno, retrofitDatosAlumno)
+
+    override val conexionRepositorio: ConexionRepositorio by lazy {
+        ConexionRepositorio(retrofitAccesoDelAlumno, retrofitDatosAlumno)
     }
 }
